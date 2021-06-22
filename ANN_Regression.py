@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[2]:
 
+
+import os
 
 import torch
 import torch.nn as nn
@@ -12,7 +15,6 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 
 import matplotlib.pyplot as plt
-get_ipython().run_line_magic('matplotlib', 'inline')
 
 import numpy as np
 import imageio
@@ -20,13 +22,10 @@ import imageio
 import pandas as pd
 
 
-# In[44]:
-
-
 #Reproducible
 torch.manual_seed(1)
 
-
+# Build an artificial neural network with one hidden layer
 class Model(torch.nn.Module):
     def __init__(self, n_features, n_hidden, n_output):
         super(Model, self).__init__()
@@ -38,20 +37,14 @@ class Model(torch.nn.Module):
         x = self.predict(x)
         return x
 
-# ### Check whether the GPU is available
+
+# Check whether the GPU is available
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
-
-
-# ### Process training and testing data
-
 
 # Fabricate the dummy test and training data
 x = torch.unsqueeze(torch.linspace(-1, 1, 100), dim=1)  # x data (tensor), shape=(100, 1)
 y = x.pow(2) + 0.2*torch.rand(x.size())                 # noisy y data (tensor), shape=(100, 1)
-
-
-# In[58]:
 
 
 # Convert the data as variables
@@ -67,12 +60,12 @@ plt.xlabel('Independent variable')
 plt.ylabel('Dependent variable')
 plt.show()
 
-
+# Tune the parameter
 EPOCHS = 100
 BATCH_SIZE = 64
 LEARNING_RATE = 0.001
 
-
+#Tune the learner
 net = Model(n_features = 1, n_hidden = 10, n_output = 1)
 # net.to(device)
 loss_func = nn.MSELoss()
@@ -80,11 +73,7 @@ optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE)
 print(net.parameters)
 
 
-# ### Train the network
-
-# In[74]:
-
-
+# Train the network
 # for t in range(1, EPOCHS+1):
 # #     x, y = x.to(device), y.to(device)
 #
@@ -99,19 +88,13 @@ print(net.parameters)
 #     #backpropagation
 #     train_loss.backward()
 #     optimizer.step()
-#
-#
-#
-#
-# # In[75]:
-
 
 my_images = []
 fig, ax = plt.subplots(figsize=(12,7))
 
 # train the network
 for t in range(200):
-  
+
     prediction = net(x)     # input x and predict based on x
 
     loss = loss_func(prediction, y)     # must be (1. nn output, 2. target)
@@ -119,7 +102,7 @@ for t in range(200):
     optimizer.zero_grad()   # clear gradients for next train
     loss.backward()         # backpropagation, compute gradients
     optimizer.step()        # apply gradients
-    
+
     # plot and show learning process
     plt.cla()
     ax.set_title('Regression Analysis', fontsize=35)
@@ -133,7 +116,7 @@ for t in range(200):
     ax.text(1.0, 0, 'Loss = %.4f' % loss.data.numpy(),
             fontdict={'size': 24, 'color':  'red'})
 
-    # Used to return the plot as an image array 
+    # Used to return the plot as an image array
     # (https://ndres.me/post/matplotlib-animated-gifs-easily/)
     fig.canvas.draw()       # draw the canvas, cache the renderer
     image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
@@ -143,7 +126,3 @@ for t in range(200):
 
 
 # In[ ]:
-
-
-
-
