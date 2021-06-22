@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
-
-
-import os
-get_ipython().system('pip install imageio')
-
-
-# In[43]:
 
 
 import torch
@@ -35,18 +27,23 @@ import pandas as pd
 torch.manual_seed(1)
 
 
+class Model(torch.nn.Module):
+    def __init__(self, n_features, n_hidden, n_output):
+        super(Model, self).__init__()
+        self.hidden = torch.nn.Linear(n_features, n_hidden)
+        self.predict = torch.nn.Linear(n_hidden, n_output)
+
+    def forward(self, x):
+        x = F.relu(self.hidden(x))
+        x = self.predict(x)
+        return x
+
 # ### Check whether the GPU is available
-
-# In[45]:
-
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
 
 
 # ### Process training and testing data
-
-# In[57]:
 
 
 # Fabricate the dummy test and training data
@@ -61,8 +58,6 @@ y = x.pow(2) + 0.2*torch.rand(x.size())                 # noisy y data (tensor),
 x, y = Variable(x), Variable(y)
 
 
-# In[59]:
-
 
 # Visualize data
 plt.figure(figsize = (10, 4))
@@ -73,35 +68,9 @@ plt.ylabel('Dependent variable')
 plt.show()
 
 
-# ### Build the feedforward neural network
-
-# In[70]:
-
-
-# Build an artificial neural network with one hidden layer
-class Model(torch.nn.Module):
-    def __init__(self, n_features, n_hidden, n_output):
-        super(Model, self).__init__()
-        self.hidden = torch.nn.Linear(n_features, n_hidden)
-        self.predict = torch.nn.Linear(n_hidden, n_output)
-    
-    def forward(self, x):
-        x = F.relu(self.hidden(x))
-        x = self.predict(x)
-        return x
-
-
-# ### Tune the learner
-
-# In[71]:
-
-
 EPOCHS = 100
 BATCH_SIZE = 64
 LEARNING_RATE = 0.001
-
-
-# In[72]:
 
 
 net = Model(n_features = 1, n_hidden = 10, n_output = 1)
@@ -116,25 +85,25 @@ print(net.parameters)
 # In[74]:
 
 
-for t in range(1, EPOCHS+1):
-#     x, y = x.to(device), y.to(device)
-    
-    predict = net(x)
-    
-    #must be (1.nn output, 2.target)
-    train_loss = loss_func(predict, y)
-    
-    #clear gradient for next train
-    optimizer.zero_grad()
-    
-    #backpropagation
-    train_loss.backward()
-    optimizer.step()
-    
-    
-
-
-# In[75]:
+# for t in range(1, EPOCHS+1):
+# #     x, y = x.to(device), y.to(device)
+#
+#     predict = net(x)
+#
+#     #must be (1.nn output, 2.target)
+#     train_loss = loss_func(predict, y)
+#
+#     #clear gradient for next train
+#     optimizer.zero_grad()
+#
+#     #backpropagation
+#     train_loss.backward()
+#     optimizer.step()
+#
+#
+#
+#
+# # In[75]:
 
 
 my_images = []
