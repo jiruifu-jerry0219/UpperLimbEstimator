@@ -6,7 +6,7 @@
 
 import os
 import glob
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 import torch
 import torch.nn as nn
