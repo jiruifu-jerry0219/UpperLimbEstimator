@@ -27,7 +27,7 @@ def getIEMG(rawEMGSignal):
 
 
 def getMAV(rawEMGSignal):
-    """ This functions compute the  average of EMG signal Amplitude.::
+    """ Thif functions compute the  average of EMG signal Amplitude.::
 
             MAV = 1/N * sum(|xi|) for i = 1 --> N
 
