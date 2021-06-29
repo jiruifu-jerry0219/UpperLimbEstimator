@@ -1,40 +1,39 @@
+import os
+import glob
 
-import peakutils  # peak detection
-import numpy as np  # to handle datas
-import math  # to handle mathematical stuff (example power of 2)
-from scipy.signal import butter, lfilter, welch, square  # for signal filtering
+import numpy as np
+import math
 
+import matplotlib.pyplot as plt
+import seaborn
 
-class getFeaturesTD:
-    def __init__(self, signal, windowSize, step):
-        self.emg = signal
-        self.window = windowSize
-        self.step = step
+def full_wave_rectify(signal):
+    rectify_emg = np.absolute(signal)
+    return rectify_emg
 
-    def getMAV(self):
-        """
-        Mean absolute value
-        """
-        MAV = (1 / len(self.emg)) * np.sum([abs(x) for x in self.emg])
-        return MAV
+def plot_signal_one(signal, time, xlabel, ylabel, title, fname):
+    fir = plt.figure()
+    plt.plot(time, signal)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    fig_name =fname
+    fig.set_size_inches(w=11,h=7)
+    fig.savefig(fig_name)
 
-    def getSSI(self):
-        """
-        Simple square integral
-        """
-        SSI = np.sum([x ** 2 for x in self.emg])
-        return SSI
-
-    def getVAR(self):
-        """
-        Variance of EMG
-        """
-        VAR = (1 / (len(self.emg) - 1)) * np.sum([x ** 2 for x in self.emg])
-        return VAR
-
-    def getRMS(self):
-        """
-        Root mean square
-        """
-        RMS = np.sqrt((1 / len(self.emg)) * np.sum([x ** 2 for x in self.emg]))
-        return RMS
+def plot_multiple(signal, time, num_of_plot, xlabel, ylabel, title, fname):
+    row_num = math.ceil(num_of_plot / 2)
+    fig, a = plt.subplots(row_num, 2)
+    assert len(signal)==len(time)==num_of_plot, "Length of signals must equal to length of time and total number of plots"
+    n = 0
+    for i in range(row_num):
+        for j in range(2):
+            if n<= num_of_plot:
+                a[i][j].plot(time[n], signal[n])
+                a[i][j].set_title(title[n])
+                a[i][j].xlabel(xlabel[n])
+                a[i][j].ylabel(ylabel[n])
+                n += 1
+            else:
+                pass
+    plt.show()
