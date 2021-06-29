@@ -5,26 +5,41 @@ import math  # to handle mathematical stuff (example power of 2)
 from scipy.signal import butter, lfilter, welch, square  # for signal filtering
 
 
+class getFeaturesTD:
+    def __init__(self, signal, windowSize, step):
+        self.emg = signal
+        self.window = windowSize
+        self.step = step
 
-def getIEMG(rawEMGSignal):
-    """ This function compute the sum of absolute values of EMG signal Amplitude.::
+    def getMAV(self):
+        """
+        Mean absolute value
+        """
+        MAV = (1 / len(self.emg)) * np.sum([abs(x) for x in self.emg])
+        return MAV
 
-            IEMG = sum(|xi|) for i = 1 --> N
+    def getSSI(self):
+        """
+        Simple square integral
+        """
+        SSI = np.sum([x ** 2 for x in self.emg])
+        return SSI
 
-        * Input:
-            * raw EMG Signal as list
-        * Output:
-            * integrated EMG
+    def getVAR(self):
+        """
+        Variance of EMG
+        """
+        VAR = (1 / (len(self.emg) - 1)) * np.sum([x ** 2 for x in self.emg])
+        return VAR
 
-        :param rawEMGSignal: the raw EMG signal
-        :type rawEMGSignal: list
-        :return: the IEMG of the EMG Signal
-        :rtype: float
-    """
+    def getRMS(self):
+        """
+        Root mean square
+        """
+        RMS = np.sqrt((1 / len(self.emg)) * np.sum([x ** 2 for x in self.emg]))
+        return RMS
 
-    IEMG = np.sum([abs(x) for x in rawEMGSignal])
-    return (IEMG)
-
+    
 
 def getMAV(rawEMGSignal):
     """ This functions compute the  average of EMG signal Amplitude.::
