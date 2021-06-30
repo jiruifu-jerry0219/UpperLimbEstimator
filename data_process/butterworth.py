@@ -10,6 +10,19 @@ The program for Butterworth Filter:
 2. Lowpass Filter
 3. Bandpass Filter
 """
+def band_stop(x, fs, fh, fl, order):
+    """
+    Apply a bandstop filter
+    """
+    fny = 0.5 * fs
+    assert fh < fl ,'High cutoff frequency must be less than low cutoff frequency'
+    cutoffHigh = fh / fny
+    cutoffLow = fl / fny
+
+    [b, a] = signal.butter(order, [cutoffHigh, cutoffLow], btype = 'stop')
+    emg_notch = signal.filtfilt(b, a, x)
+
+    return emg_notch
 
 def band_pass(signal, fs = 2000, high_band = 1000, low_band = 10, order = 4):
     """
@@ -57,5 +70,5 @@ def high_pass(signal, fs = 2000, high_pass = 10, order = 4):
     high_pass = high_pass / (fs / 2)
     b, a = scipy.signal.butter(order, high_pass, btype = 'highpass')
     emg_envelop = scipy.signal.filtfilt(b, a, signal)
-    
+
     return emg_envelop
