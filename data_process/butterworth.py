@@ -11,7 +11,7 @@ The program for Butterworth Filter:
 3. Bandpass Filter
 """
 
-def band_pass(signal, fs = 2000, high_band = 1000, low_band = 10, order = 4, padB = False, axs = -1, pad = 0):
+def band_pass(signal, fs = 2000, high_band = 1000, low_band = 10, order = 4):
     """
     signal: rectified EMG data
     high_band: high pass filter cut off frequency
@@ -26,13 +26,10 @@ def band_pass(signal, fs = 2000, high_band = 1000, low_band = 10, order = 4, pad
     b, a = scipy.signal.butter(order, [low_band, high_band], btype='bandpass')
 
     # Filter EMG
-    if padB:
-        emg_bandpass = scipy.signal.filtfilt(b, a, signal, padlen = pad, axis = axs)
-    else:
-        emg_bandpass = scipy.signal.filtfilt(b, a, signal, axis = axs)
+    emg_bandpass = scipy.signal.filtfilt(b, a, signal)
     return emg_bandpass
 
-def low_pass(signal, fs = 2000, low_pass = 10, order = 4, axs = -1, padB = False, pad = 0):
+def low_pass(signal, fs = 2000, low_pass = 10, order = 4):
     """
     signal: rectified EMG data
     low_pass: low pass filter cut off frequency
@@ -45,14 +42,11 @@ def low_pass(signal, fs = 2000, low_pass = 10, order = 4, axs = -1, padB = False
     #create lowpass filter
     b, a = scipy.signal.butter(order, low_pass, btype = 'lowpass')
 
-    if padB:
-        emg_envelop = scipy.signal.filtfilt(b, a, signal, padlen = pad, axis = axs )
-    else:
-        emg_envelop = scipy.signal.filtfilt(b, a, signal, axis = axs)
+    emg_envelop = scipy.signal.filtfilt(b, a, signal)
 
     return emg_envelop
 
-def high_pass(signal, fs = 2000, high_pass = 10, order = 4, axs = -1, padB = False, pad = 0):
+def high_pass(signal, fs = 2000, high_pass = 10, order = 4):
     """
     signal: rectified EMG data
     high_pass: high pass filter cut off frequency
@@ -62,8 +56,6 @@ def high_pass(signal, fs = 2000, high_pass = 10, order = 4, axs = -1, padB = Fal
 
     high_pass = high_pass / (fs / 2)
     b, a = scipy.signal.butter(order, high_pass, btype = 'highpass')
-    if padB:
-        emg_envelop = scipy.signal.filtfilt(b, a, signal, padlen = pad, axis = axs)
-    else:
-        emg_envelop = scipy.signal.filtfilt(b, a, signal, axis = axs)
+    emg_envelop = scipy.signal.filtfilt(b, a, signal)
+    
     return emg_envelop
