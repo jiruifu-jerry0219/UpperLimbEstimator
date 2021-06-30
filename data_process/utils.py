@@ -23,17 +23,16 @@ def plot_signal_one(signal, time, xlabel, ylabel, title, fname):
 
 def plot_multiple(signal, time, num_of_plot, xlabel, ylabel, title, fname):
     row_num = math.ceil(num_of_plot / 2)
-    fig, a = plt.subplots(row_num, 2)
-    assert len(signal)==len(time)==num_of_plot, "Length of signals must equal to length of time and total number of plots"
+    fig, a = plt.subplots(row_num, 2, figsize = (15, 15))
+    assert len(signal)==len(time), "Length of signals must equal to length of time and total number of plots"
     n = 0
     for i in range(row_num):
         for j in range(2):
-            if n<= num_of_plot:
+            if n<= num_of_plot - 1:
                 a[i][j].plot(time[n], signal[n])
                 a[i][j].set_title(title[n])
-                a[i][j].xlabel(xlabel[n])
-                a[i][j].ylabel(ylabel[n])
                 n += 1
             else:
                 pass
     plt.show()
+    fig.savefig(fname)
