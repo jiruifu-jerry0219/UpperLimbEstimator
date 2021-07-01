@@ -16,15 +16,6 @@ import math
 from butterworth import band_pass, low_pass, high_pass, band_stop
 from utils import full_wave_rectify, plot_signal_one, plot_multiple, getEMGfeatures, toDataframe
 
-
-# x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-# xa = np.asarray(x)
-# vara = (1 / (len(xa) - 1)) * np.sum([s ** 2 for s in xa])
-# print(vara)
-# a = 4
-# print(np.sqrt(a))
-
-
 a = np.arange(10, 5831, 10)
 j = 0
 for i in range(len(a)):

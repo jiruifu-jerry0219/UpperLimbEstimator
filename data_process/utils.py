@@ -49,14 +49,15 @@ def getEMGfeatures(emg, window = 1, step = 1):
     """
     featuresSet = []
     endPt = len(emg)
-    pts = np.arange(window, endPt, step)
+    pts = np.arange(window - 1, endPt, step)
+    print(pts)
     j = 0
-    for i in range(len(pts)):
+    for i in range(len(pts + 1)):
         j += 1
         m1 = pts[i] - window + 1
-        m2 = pts[i]
+        m2 = pts[i] - 1
         # print('Sampling from', m1, ' to ', m2)
-        sampleEMG = emg[pts[i] - window : pts[i], :]
+        sampleEMG = emg[pts[i] - window + 1 : pts[i], :]
         assert len(sampleEMG) != 0, 'please check for mistake'
         feature = F(sampleEMG, window, step)
         featuresSet.append(feature)
