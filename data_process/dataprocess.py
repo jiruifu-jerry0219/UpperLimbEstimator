@@ -14,43 +14,55 @@ from scipy.signal import freqz
 import math
 
 from butterworth import band_pass, low_pass, high_pass, band_stop
-from utils import full_wave_rectify, plot_signal_one, plot_multiple, getEMGfeatures, toDataframe
+from utils import full_wave_rectify, plot_signal_one, plot_multiple
+from utils import getEMGfeatures, toDataframe, normalization
 
-a = np.arange(10, 5831, 10)
-j = 0
-for i in range(len(a)):
-    j += 1
-print(j)
+
 
 # Setup the parameters of signal
 f = 2000
 
 
-path = r'/home/jerry/GitHub/EMG_regressive_model/data_process/raw_data'
+# path = r'/home/jerry/GitHub/EMG_regressive_model/data_process/raw_data'
 # path = r'D:/GitHub/EMG_regressive_model/data_process/raw_data'
-all_files = glob.glob(path+'/*.csv')
+pathEmg = r'/home/jerry/GitHub/EMG_regressive_model/data_process/raw_data/type2/emg'
+
+emg_files = glob.glob(pathEmg+'/*.csv')
 dfList = []
 
-# Read .csv file by using panda
-# for filename in all_files:
-file = all_files[0]
-saveName = file[-11:-4]
-print('The csv file read into the program is:', file)
-allData = pd.read_csv(file, skiprows = 4, header = None)
+for filename in emg_files:
+    headers = [*pd.read_csv(filename, nrows  = 1)]
+    df = pd.read_csv(filename, usecols=[c for c in headers if c != 'time'])
+    dfList.append(df)
 
+#Concatenate individual column dataframes into one data frame (don't forget axis)
+emgData = pd.concat(dfList, axis = 1)
 
-# Create the dataframe for EMG data and Joint angle
-emgData = allData.iloc[:, 3:6]
-angleData = allData.iloc[:, 32:33]
+pathElbow = r'/home/jerry/GitHub/EMG_regressive_model/data_process/raw_data/type2/kin'
+imu_files = glob.glob(pathElbow+'/*.csv')
+
+dfList2 = []
+
+for filename in imu_files:
+    headers = [*pd.read_csv(filename, nrows  = 1)]
+    df = pd.read_csv(filename, usecols=[c for c in headers if c != 'time'])
+    dfList2.append(df)
+#Concatenate individual column dataframes into one data frame (don't forget axis)
+angleData = pd.concat(dfList2, axis = 1)
+angle = angleData.to_numpy()
+angle = angle[:, 0]
+notch = band_stop(angle, fs = 200, fh = 9, fl = 10, order = 4)
+imu_filter = low_pass(notch, fs = 200, low_pass = 2, order = 2)
+imu = np.reshape(imu_filter, (-1, 1))
+normImu = normalization(imu)
+print(normImu.shape)
+
 
 #Convert the dataframe to numpy array
 emg = emgData.to_numpy()
 time = np.array([i/f for i in range(0, len(emg), 1)]) # sampling rate 2000 Hz
 mean = np.mean(emg, axis = 0)
 emgAvg = emg - mean
-
-angle = angleData.to_numpy()
-
 emgSize = emgAvg.shape
 
 bpEmg = np.zeros(emgSize)
@@ -58,35 +70,26 @@ bpEmg = np.zeros(emgSize)
 for i in range(emgSize[-1]):
     input = emgAvg[:, i]
     iuput = input.T
-    notch = band_stop(input, fs = f, fh = 20, fl = 60, order = 4)
-    bandpass = low_pass(notch ,fs = f, low_pass = 2, order = 2)
+    notch = band_stop(input, fs = f, fh = 2, fl = 20, order = 2)
+    bandpass = low_pass(notch ,fs = f, low_pass = 20, order = 4)
     bpEmg[:, i] = bandpass
 
 # erform the full wave rectification
 rectEmg = full_wave_rectify(bpEmg)
 print(rectEmg.shape)
+
+#Feature extraction
 emgFeatures = getEMGfeatures(rectEmg, 10, 10)
-print(emgFeatures.shape)
+emgNorm = normalization(emgFeatures)
+print(emgNorm.shape)
+
+#Concatenate emg data and elbow data
+dataset = np.hstack((emgNorm, normImu))
+print(dataset.shape)
+
 a = ['ch '+ str(x) for x in range(1, 16)]
-dfFeatures = toDataframe(emgFeatures,
+a.append('angle')
+dfFeatures = toDataframe(dataset,
         head = a,
         save = True,
         path = r'/home/jerry/GitHub/EMG_regressive_model/data_process/data/export.csv')
-
-
-# a = emg.shape
-# c = np.zeros(a)
-# for i in range(a[-1]):
-#     c[:, i] = emg[:, i]
-# print(type(c),'and', type(emg))
-#
-#
-# # In[31]:
-#
-#
-# tit = ['EMG CH1', 'EMG CH2', 'EMG CH3']
-# filename = 'emg_filter_lp_f4o10.png'
-# signal = [rectEmg[:, 0], rectEmg[:, 1], rectEmg[:, 2]]
-# t = [time, time, time]
-#
-# plot_multiple(signal, t, 3, 'Time', 'EMG', tit, filename)

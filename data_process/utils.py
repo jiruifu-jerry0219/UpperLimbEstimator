@@ -75,5 +75,23 @@ def toDataframe(data, head, save = False, path = None):
 
     return df
 
+def normalization(data):
+    """Data must be trial * channels"""
+    size = data.shape
+    pool = []
+    for i in range(size[-1]):
+        process = data[:, i]
+        minmax = (process - process.min()) / (process.max() - process.min())
+        norm = np.reshape(minmax, (-1, 1))
+
+        print('The size of', i,'th array is', norm.shape)
+        pool.append(norm)
+
+
+    result = np.hstack(pool)
+    return result
+
+
+
 def dataExport(path, df, idx = False, hd = True):
     df.to_csv(path, index = idx, header = hd)
