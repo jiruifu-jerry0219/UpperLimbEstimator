@@ -13,9 +13,9 @@ from scipy.signal import freqz
 
 import math
 
-from butterworth import band_pass, low_pass, high_pass, band_stop
-from utils import full_wave_rectify, plot_signal_one, plot_multiple
-from utils import getEMGfeatures, toDataframe, normalization
+from utils.butterworth import band_pass, low_pass, high_pass, band_stop
+from utils.utils import full_wave_rectify, plot_signal_one, plot_multiple
+from utils.utils import getEMGfeatures, toDataframe, normalization
 
 
 

@@ -57,7 +57,6 @@ def low_pass(signal, fs = 2000, low_pass = 10, order = 4):
 
     emg_envelop = scipy.signal.filtfilt(b, a, signal)
 
-    return emg_envelop
 
 def high_pass(signal, fs = 2000, high_pass = 10, order = 4):
     """
