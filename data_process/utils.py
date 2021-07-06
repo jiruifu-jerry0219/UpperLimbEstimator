@@ -7,6 +7,8 @@ import math
 import matplotlib.pyplot as plt
 import seaborn
 
+from getFeaturesTD import getfeaturesTD as F
+
 import pandas as pd
 
 def full_wave_rectify(signal):
@@ -57,39 +59,11 @@ def getEMGfeatures(emg, window = 1, step = 1):
         # print('Sampling from', m1, ' to ', m2)
         sampleEMG = emg[pts[i] - window + 1 : pts[i], :]
         assert len(sampleEMG) != 0, 'please check for mistake'
-        feature = getfeaturesTD(sampleEMG, window, step)
+        feature = F(sampleEMG, window, step)
         featuresSet.append(feature)
 
     featureTD = np.vstack(featuresSet)
     return featureTD
-
-def getfeaturesTD(emg, windows, step):
-    pool = []
-    col = emg.shape
-    for i in range(col[-1]):
-        s = emg[:, i]
-        assert len(s) != 0, "The length of input vector is zero!"
-        # print('The length of current vector is:', len(s))
-
-        MAV = (1 / len(s)) * np.sum([abs(x) for x in s])
-
-
-        SSI = np.sum([x ** 2 for x in s])
-
-        VAR = (1 / (len(s) - 1)) * np.sum([x ** 2 for x in s])
-
-        RMS = np.sqrt((1 / len(s)) * np.sum([x ** 2 for x in s]))
-
-        LOG = math.exp((1 / len(s)) * sum([abs(x) for x in s]))
-
-        cln = np.vstack((MAV, SSI, VAR, RMS, LOG))
-
-
-        pool.append(cln)
-
-    featureSet = np.vstack(pool)
-    # print('The shape of feature set in this iteration is', featureSet.T.shape)
-    return featureSet.T
 
 def toDataframe(data, head, save = False, path = None):
     """Convert a numpy matrix to a panda dataframe"""
@@ -100,24 +74,6 @@ def toDataframe(data, head, save = False, path = None):
         dataExport(path, df, idx = False, hd = True)
 
     return df
-
-def normalization(data):
-    """Data must be trial * channels"""
-    size = data.shape
-    pool = []
-    for i in range(size[-1]):
-        process = data[:, i]
-        minmax = (process - process.min()) / (process.max() - process.min())
-        norm = np.reshape(minmax, (-1, 1))
-
-        print('The size of', i,'th array is', norm.shape)
-        pool.append(norm)
-
-
-    result = np.hstack(pool)
-    return result
-
-
 
 def dataExport(path, df, idx = False, hd = True):
     df.to_csv(path, index = idx, header = hd)
